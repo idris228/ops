@@ -1,0 +1,55 @@
+скрипт для воссоздания бд
+
+
+CREATE DATABASE shop_db
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+USE shop_db;
+
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    login VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    role ENUM('client', 'manager', 'admin')
+);
+
+CREATE TABLE products (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    category VARCHAR(100),
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    manufacturer VARCHAR(100),
+    supplier VARCHAR(100),
+    price INT NOT NULL,
+    stock_quantity INT NOT NULL DEFAULT 0,
+    discount INT DEFAULT 0,
+    image_path VARCHAR(255)
+);
+
+CREATE TABLE orders (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    total_price INT NOT NULL,
+    status VARCHAR(100) NOT NULL DEFAULT 'new',
+    CONSTRAINT fk_orders_users FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_orders_products FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+INSERT INTO users (login, password, role) VALUES
+('admin', '123', 'admin'),
+('manager', '123', 'manager'),
+('idris', '123', 'client'),
+('maga', '123', 'client');
+
+INSERT INTO products (category, name, description, manufacturer, supplier, price, stock_quantity, discount, image_path) VALUES
+('Электроника', 'Смартфон X1', 'Флагманский смартфон с отличной камерой', 'TechCorp', 'GlobalDist', 50000, 15, 5, '/images/x1.jpg'),
+('Электроника', 'Беспроводные наушники Pro', 'Наушники с активным шумоподавлением', 'AudioBass', 'GlobalDist', 12000, 40, 0, '/images/headphones.jpg'),
+('Бытовая техника', 'Умный чайник', 'Управление со смартфона, объем 1.7л', 'SmartHome', 'ElectroOpt', 3500, 8, 10, '/images/kettle.jpg');
+
+INSERT INTO orders (user_id, product_id, quantity, total_price, status) VALUES
+(3, 1, 1, 47500, 'new'),
+(3, 2, 2, 24000, 'completed'),
+(4, 3, 1, 31500, 'in_progress');
